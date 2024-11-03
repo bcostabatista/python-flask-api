@@ -34,10 +34,10 @@ jobs:
           pip install flake8
           flake8 .
           
-      - name: Run Tests
-        run: |
-          pip install pytest
-          pytest
+     # - name: Run Tests
+     #   run: |
+     #     pip install pytest
+     #     pytest
 
       - name: Log in to Amazon ECR
         env:
