@@ -19,19 +19,21 @@ a function as an argument.
 the function it receives as an argument
 is the function it's decorating.
 """
+
+
 def route_decorator(func):
     """
-    wrapper functions in decorators are 
+    wrapper functions in decorators are
     usually needed but not required.
 
-    You can use both *args and **kwargs in 
-    the same function definition. When doing so, 
+    You can use both *args and **kwargs in
+    the same function definition. When doing so,
     *args must come before **kwargs
 
-    *args: allows a function to accept any 
+    *args: allows a function to accept any
     number of positional arguments.
 
-    **kwargs: allows a function to accept any 
+    **kwargs: allows a function to accept any
     number of keyword arguments.
     """
     def wrapper(*args, **kwargs):
@@ -39,11 +41,12 @@ def route_decorator(func):
         return func(*args, **kwargs)
     return wrapper
 
+
 @app.route('/api/v1/resource', methods=['GET'])
 @route_decorator
 def get_resource():
     data = requests.get(f"{API_BASE_URL}/projects").json()
-    
+
     projects = {}
     for d in data:
         if d["namespace"]["id"] not in projects:
@@ -53,6 +56,7 @@ def get_resource():
 
     sorted_projects = dict(sorted(projects.items(), key=lambda x: x))
     return jsonify(sorted_projects), 200
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)
