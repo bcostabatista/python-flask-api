@@ -1,0 +1,40 @@
+name: CD
+
+on:
+  workflow_run:
+    workflows: ["CI - Build, Lint, Test, and Push to ECR"]
+    types:
+      - completed
+
+jobs:
+ deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Kubernetes context
+      uses: azure/setup-kubectl@v1
+      with:
+        version: 'latest'
+
+    - name: Install yq
+      run: |
+        sudo snap install yq
+
+    - name: Install Helm
+      run: |
+        curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+
+    - name: Configure Kubernetes context
+      env:
+        KUBECONFIG: ${{ secrets.KUBE_CONFIG }}
+      run: |
+        echo "$KUBECONFIG" > $HOME/.kube/config
+        kubectl config use-context "${{ github.event.inputs.environment }}"
+
+    - name: Deploy Helm Chart
+      run: |
+        NAMESPACE=$(yq eval '.namespace' values.yaml)
+        helm upgrade --install --generate-name ./_infra --namespace "$NAMESPACE" --values values.yaml

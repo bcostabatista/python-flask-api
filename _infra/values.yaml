@@ -1,0 +1,23 @@
+replicaCount: 1
+
+namespace: python-flask-api
+
+image:
+  repository: update-this-later/flask-api
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "256Mi"
+  limits:
+    cpu: "200m"
+    memory: "512Mi"
+
+service:
+  type: LoadBalancer
+  port: 5001
+
+env:
+  API_BASE_URL: "https://gitlab.com/api/v4"

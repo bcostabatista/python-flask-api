@@ -1,0 +1,54 @@
+name: CI - Build, Lint, Test, and Push to ECR
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'feature/*'
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build_lint_test_and_push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Linter
+        run: |
+          pip install flake8
+          flake8 .
+          
+      - name: Run Tests
+        run: |
+          pip install pytest
+          pytest
+
+      - name: Log in to Amazon ECR
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-west-2
+        run: |
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin <account-id>.dkr.ecr.<region>.amazonaws.com
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t my-flask-api .
+          docker tag my-flask-api:latest <account-id>.dkr.ecr.<region>.amazonaws.com/my-flask-api:latest
+          docker push <account-id>.dkr.ecr.<region>.amazonaws.com/my-flask-api:latest
