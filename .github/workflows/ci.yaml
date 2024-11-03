@@ -79,7 +79,7 @@ jobs:
 
   notify:
     runs-on: ubuntu-latest
-    needs: [linter, tests, build, push_to_ecr]
+    needs: [linter, tests, build_and_push_to_ecr]
     if: ${{ always() }} # Always run the notify job
     steps:
       - name: Send notification to Slack
