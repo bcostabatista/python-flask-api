@@ -54,7 +54,6 @@ def get_resource():
 
         projects[d["namespace"]["id"]].append(d["name"])
 
-    projects["custom_field"] = "custom field value"
     return jsonify(projects), 200
 
 
