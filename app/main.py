@@ -1,14 +1,14 @@
 from flask import Flask, jsonify
 import requests
 import logging
+import os
 
 app = Flask(__name__)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# turn this into an env var with a configmap
-API_BASE_URL = "https://gitlab.com/api/v4"
+API_BASE_URL = os.getenv('API_BASE_URL')
 
 """
 decorators can be used to process

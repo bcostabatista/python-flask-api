@@ -35,6 +35,8 @@ jobs:
         kubectl config use-context "${{ github.event.inputs.environment }}"
 
     - name: Deploy Helm Chart
+      env:
+        AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
       run: |
         NAMESPACE=$(yq eval '.namespace' values.yaml)
-        helm upgrade --install --generate-name ./_infra --namespace "$NAMESPACE" --values values.yaml
+        helm upgrade --install --generate-name ./_infra --namespace "$NAMESPACE" --values values.yaml --set awsAccountId=${AWS_ACCOUNT_ID}
