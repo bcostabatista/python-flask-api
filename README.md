@@ -19,3 +19,9 @@ docker ps
 ````bash
 docker logs <container_id>
 ````
+
+## Deploying with helm
+
+````bash
+helm install --generate-name ./_infra --namespace python-flask-api
+````

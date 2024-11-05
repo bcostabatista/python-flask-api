@@ -7,34 +7,51 @@ on:
       - completed
 
 jobs:
- deploy:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.ref == 'refs/heads/bruno--setup-cd' }}
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Set up Kubernetes context
-      uses: azure/setup-kubectl@v1
-      with:
-        version: 'latest'
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
-    - name: Install yq
-      run: |
-        sudo snap install yq
+      - name: Assume Role
+        id: assume-role
+        run: |
+          ROLE_ARN="arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/eks-cluster-management-role"
+          CREDS_JSON=$(aws sts assume-role --role-arn $ROLE_ARN --role-session-name GitHubActionsSession)
+          echo "::set-output name=aws_access_key_id::$(echo $CREDS_JSON | jq -r .Credentials.AccessKeyId)"
+          echo "::set-output name=aws_secret_access_key::$(echo $CREDS_JSON | jq -r .Credentials.SecretAccessKey)"
+          echo "::set-output name=aws_session_token::$(echo $CREDS_JSON | jq -r .Credentials.SessionToken)"
 
-    - name: Install Helm
-      run: |
-        curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+      - name: Set AWS Credentials from Assumed Role
+        run: |
+          echo "AWS_ACCESS_KEY_ID=${{ steps.assume-role.outputs.aws_access_key_id }}" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=${{ steps.assume-role.outputs.aws_secret_access_key }}" >> $GITHUB_ENV
+          echo "AWS_SESSION_TOKEN=${{ steps.assume-role.outputs.aws_session_token }}" >> $GITHUB_ENV
 
-    - name: Configure Kubernetes context
-      env:
-        KUBECONFIG: ${{ secrets.KUBE_CONFIG }}
-      run: |
-        echo "$KUBECONFIG" > $HOME/.kube/config
-        kubectl config use-context "${{ github.event.inputs.environment }}"
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig --name ${{ secrets.CLUSTER_NAME }} --region ${{ secrets.AWS_REGION }}
 
-    - name: Deploy Helm Chart
-      run: |
-        NAMESPACE=$(yq eval '.namespace' values.yaml)
-        helm upgrade --install --generate-name ./_infra --namespace "$NAMESPACE" --values values.yaml
+      - name: Install yq
+        run: |
+          sudo snap install yq
+
+      - name: Install Helm
+        run: |
+          curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+
+      - name: Deploy Helm Chart
+        env:
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+        run: |
+          NAMESPACE=$(yq eval '.namespace' values.yaml)
+          helm upgrade --install --generate-name ./_infra --namespace "$NAMESPACE" --values values.yaml --set awsAccountId=${AWS_ACCOUNT_ID}
