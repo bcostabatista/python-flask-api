@@ -34,7 +34,7 @@ def route_decorator(func):
     number of positional arguments.
 
     **kwargs: allows a function to accept any
-    number of keyword arguments.
+    number of keyword arguments
     """
     def wrapper(*args, **kwargs):
         logger.info("decorating with decorators")
