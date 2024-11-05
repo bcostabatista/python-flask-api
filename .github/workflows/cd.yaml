@@ -55,5 +55,5 @@ jobs:
         env:
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
         run: |
-          NAMESPACE=$(yq eval '.namespace' ./_infra/values.yaml)
-          helm upgrade --install --generate-name ./_infra --namespace "$NAMESPACE" --values ./_infra/values.yaml --set awsAccountId=${AWS_ACCOUNT_ID}
+          NAMESPACE=$(yq eval '.namespace' ${{ github.workspace }}/_infra/values.yaml)
+          helm upgrade --install --generate-name ${{ github.workspace }}/_infra --namespace "$NAMESPACE" --values ./_infra/values.yaml --set awsAccountId=${AWS_ACCOUNT_ID}
