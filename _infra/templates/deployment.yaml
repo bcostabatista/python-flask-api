@@ -2,7 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "flask-api.fullname" . }}
-  namespace: {{ .Values.namespace }} 
+  namespace: {{ .Values.namespace }}
+  annotations:
+    redeployTimestamp: {{ .Values.redeployTimestamp | quote }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -12,6 +14,8 @@ spec:
     metadata:
       labels:
         app: {{ include "flask-api.name" . }}
+      annotations:
+        redeployTimestamp: {{ .Values.redeployTimestamp | quote }}
     spec:
       containers:
         - name: flask-api

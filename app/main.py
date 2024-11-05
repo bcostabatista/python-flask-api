@@ -55,6 +55,7 @@ def get_resource():
         projects[d["namespace"]["id"]].append(d["name"])
 
     sorted_projects = dict(sorted(projects.items(), key=lambda x: x))
+    sorted_projects["custom_field"] = "custom field value"
     return jsonify(sorted_projects), 200
 
 
