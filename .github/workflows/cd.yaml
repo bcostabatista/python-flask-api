@@ -57,10 +57,10 @@ jobs:
         run: |
           NAMESPACE=$(yq eval '.namespace' "${{ github.workspace }}/_infra/values.yaml")
           RELEASE_NAME="python-flask-api" # this value can be dynamic
-          helm upgrade "$RELEASE_NAME" "${{ github.workspace }}/_infra" \
+          helm upgrade --install "$RELEASE_NAME" "${{ github.workspace }}/_infra" \
             --namespace "$NAMESPACE" \
             --values "${{ github.workspace }}/_infra/values.yaml" \
             --set awsAccountId=${AWS_ACCOUNT_ID} \
-            --set redeployTimeStamp=$(date +%s) \
+            --set redeployTimestamp=$(date +%s) \
             --set imagePullPolicy=Always \
             --force
