@@ -55,5 +55,9 @@ jobs:
         env:
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
         run: |
-          NAMESPACE=$(yq eval '.namespace' ${{ github.workspace }}/_infra/values.yaml)
-          helm upgrade --install --generate-name ${{ github.workspace }}/_infra --namespace "$NAMESPACE" --values ./_infra/values.yaml --set awsAccountId=${AWS_ACCOUNT_ID}
+          NAMESPACE=$(yq eval '.namespace' "${{ github.workspace }}/_infra/values.yaml")
+          RELEASE_NAME="python-flask-api" # this value can be dynamic
+          helm upgrade "$RELEASE_NAME" "${{ github.workspace }}/_infra" \
+            --namespace "$NAMESPACE" \
+            --values "${{ github.workspace }}/_infra/values.yaml" \
+            --set awsAccountId=${AWS_ACCOUNT_ID}
