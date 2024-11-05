@@ -48,7 +48,6 @@ def get_resource():
     data = requests.get(f"{API_BASE_URL}/projects").json()
 
     projects = {}
-    projects["new_custom_field"] = "Custom Field"
     for d in data:
         if d["namespace"]["id"] not in projects:
             projects[d["namespace"]["id"]] = []
@@ -56,6 +55,7 @@ def get_resource():
         projects[d["namespace"]["id"]].append(d["name"])
 
     sorted_projects = dict(sorted(projects.items(), key=lambda x: x))
+    sorted_projects["custom_field"] = "custom field value"
     return jsonify(sorted_projects), 200
 
 
