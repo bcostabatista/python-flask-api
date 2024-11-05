@@ -60,4 +60,7 @@ jobs:
           helm upgrade "$RELEASE_NAME" "${{ github.workspace }}/_infra" \
             --namespace "$NAMESPACE" \
             --values "${{ github.workspace }}/_infra/values.yaml" \
-            --set awsAccountId=${AWS_ACCOUNT_ID}
+            --set awsAccountId=${AWS_ACCOUNT_ID} \
+            --set redeployTimeStamp=$(date +%s) \
+            --set imagePullPolicy=Always \
+            --force
