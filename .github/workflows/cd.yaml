@@ -32,8 +32,12 @@ jobs:
       env:
         KUBECONFIG: ${{ secrets.KUBE_CONFIG }}
       run: |
+        echo "Creating .kube directory"
         mkdir -p $HOME/.kube
+        echo "Checking if .kube directory exists"
+        ls -la $HOME/.kube
         echo "$KUBECONFIG" > $HOME/.kube/config
+        echo "Kube config written to $HOME/.kube/config"
         kubectl config use-context "${{ github.event.inputs.environment }}"
 
     - name: Deploy Helm Chart
