@@ -3,7 +3,7 @@ replicaCount: 1
 namespace: python-flask-api
 
 image:
-  repository: {{ .Values.awsAccountId }}.dkr.ecr.us-east-1.amazonaws.com/labs/python-flask-api
+  repository: dkr.ecr.us-east-1.amazonaws.com/labs/python-flask-api
   tag: "latest"
   pullPolicy: IfNotPresent
 

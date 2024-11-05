@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: flask-api
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{ .Values.awsAccountId }}.{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           ports:
             - containerPort: 5001
           envFrom:
