@@ -48,6 +48,7 @@ def get_resource():
     data = requests.get(f"{API_BASE_URL}/projects").json()
 
     projects = {}
+    projects["new_custom_field"] = "Custom Field"
     for d in data:
         if d["namespace"]["id"] not in projects:
             projects[d["namespace"]["id"]] = []
