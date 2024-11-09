@@ -11,6 +11,10 @@ on:
       - main
       - develop
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   linter:
     runs-on: ubuntu-latest
